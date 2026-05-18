@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arsitektur Pedagogi: Toolkit Flow State</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* light slate */
+            color: #0f172a;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Mandatory Chart Container Styling */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 40vh;
+            min-height: 300px;
+            max-height: 450px;
+            border-radius: 0.75rem;
+            background-color: #ffffff;
+            padding: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 50vh;
+                max-height: 500px;
+            }
+        }
+
+        /* Custom Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 22px;
+            width: 22px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 3px solid #4f46e5;
+            cursor: pointer;
+            margin-top: -9px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.1s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #cbd5e1;
+            border-radius: 9999px;
+            transition: background 0.3s ease;
+        }
+        input[type=range]:focus { outline: none; }
+        
+        .transition-all-ease {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-indigo-200 selection:text-indigo-900">
+
+    <!-- Chosen Palette: Warm neutrals (slate-50) for background, Indigo/Blue for intellectual focus, Amber/Red for cognitive warnings. -->
+    <!-- Application Structure Plan: The SPA is designed as an "Interactive Pedagogical Toolkit". It is divided into 4 functional zones: 1) The Conceptual Shift, 2) The Flow Modulator, 3) Cognitive Load Simulator, and 4) Constructionist Lab. This structure allows educators to experiment with the variables mentioned in the report (Challenge, Skill, Extraneous Load) and immediately see the theoretical outcomes. -->
+    <!-- Visualization & Content Choices: 
+         - Over-gamification vs Flow: HTML comparison cards. No SVG.
+         - Flow Quadrant: Chart.js Scatter Plot with custom plugin. Interactive clicking.
+         - Cognitive Load: Dynamic HTML Flex bars linked to range sliders. Visualizes Working Memory.
+         - Numeracy Lab: Chart.js Line Chart with gradient fill. Demonstrates Immediate Feedback.
+         - Literacy Text: Interactive DOM text replacement. Simulates Extraneous Load based on ZPD. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Navbar -->
+    <nav class="bg-slate-900 text-white sticky top-0 z-50 shadow-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🧠</span>
+                    <span class="font-bold text-lg md:text-xl tracking-tight">Arsitektur Pedagogi</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="flex items-baseline space-x-2">
+                        <a href="#paradigma" class="hover:bg-slate-800 px-3 py-2 rounded-lg text-sm font-medium transition-colors">Paradigma</a>
+                        <a href="#kuadran-flow" class="hover:bg-slate-800 px-3 py-2 rounded-lg text-sm font-medium transition-colors">Kuadran Flow</a>
+                        <a href="#ergonomi" class="hover:bg-slate-800 px-3 py-2 rounded-lg text-sm font-medium transition-colors">Ergonomi</a>
+                        <a href="#laboratorium" class="hover:bg-slate-800 px-3 py-2 rounded-lg text-sm font-medium transition-colors">Laboratorium</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-20">
+
+        <!-- Header / Hero Section -->
+        <header class="text-center py-16 bg-white rounded-[2rem] shadow-sm border border-slate-200">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold uppercase tracking-wider mb-8 border border-indigo-100">
+                <span>⚡ Toolkit Pendidik Interaktif</span>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight">
+                Merekayasa <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500">Flow State</span> <br class="hidden md:block"> dalam Ekosistem Belajar
+            </h1>
+            <p class="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+                Aplikasi ini menerjemahkan buku putih <em>"Arsitektur Pedagogi"</em> menjadi laboratorium interaktif. Jelajahi bagaimana memanipulasi variabel kognitif dapat mengubah siswa dari konsumen pasif menjadi pembelajar yang terikat penuh secara intelektual.
+            </p>
+        </header>
+
+        <!-- Section 1: Paradigma -->
+        <section id="paradigma" class="scroll-mt-28">
+            <div class="mb-10 text-center md:text-left">
+                <h2 class="text-3xl font-bold text-slate-900 flex items-center justify-center md:justify-start gap-3">
+                    <span class="text-3xl">📉</span> Dekonstruksi Paradigma
+                </h2>
+                <p class="text-slate-600 mt-3 text-lg max-w-4xl">
+                    Di era <em>Attention Economy</em>, ruang kelas bersaing dengan algoritma yang membajak dopamin siswa. Merespons ini dengan "hiburan dangkal" (gamifikasi berlebih) adalah kesalahan. Kita harus beralih menuju <strong>keterlibatan mendalam (engagement)</strong>.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-red-500"></div>
+                    <div class="bg-red-50 w-14 h-14 rounded-full flex items-center justify-center text-red-500 text-2xl mb-6 group-hover:scale-110 transition-transform">🎮</div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Over-Gamification (Hiburan)</h3>
+                    <ul class="space-y-4 text-slate-600">
+                        <li class="flex items-start gap-3"><span class="text-red-500 mt-1">❌</span> <div><strong>Target:</strong> Pengumpulan poin, level, dan <em>badge</em> maya.</div></li>
+                        <li class="flex items-start gap-3"><span class="text-red-500 mt-1">❌</span> <div><strong>Sistem Reward:</strong> Ekstrinsik (Dopamin instan dari efek visual/suara).</div></li>
+                        <li class="flex items-start gap-3"><span class="text-red-500 mt-1">❌</span> <div><strong>Fokus Kognitif:</strong> Terpecah pada mekanik permainan, bukan materi.</div></li>
+                        <li class="flex items-start gap-3"><span class="text-red-500 mt-1">❌</span> <div><strong>Hasil:</strong> Retensi memori jangka pendek dan ketergantungan eksternal.</div></li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-indigo-500"></div>
+                    <div class="bg-indigo-50 w-14 h-14 rounded-full flex items-center justify-center text-indigo-500 text-2xl mb-6 group-hover:scale-110 transition-transform">🌊</div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Flow State (Keterlibatan)</h3>
+                    <ul class="space-y-4 text-slate-600">
+                        <li class="flex items-start gap-3"><span class="text-indigo-500 mt-1">✅</span> <div><strong>Target:</strong> Penaklukan tantangan intelektual yang nyata dan bermakna.</div></li>
+                        <li class="flex items-start gap-3"><span class="text-indigo-500 mt-1">✅</span> <div><strong>Sistem Reward:</strong> Intrinsik (Kepuasan dari <em>meaning-making</em>).</div></li>
+                        <li class="flex items-start gap-3"><span class="text-indigo-500 mt-1">✅</span> <div><strong>Fokus Kognitif:</strong> Terfokus 100% pada esensi materi pembelajaran.</div></li>
+                        <li class="flex items-start gap-3"><span class="text-indigo-500 mt-1">✅</span> <div><strong>Hasil:</strong> Kemandirian belajar seumur hidup & retensi memori jangka panjang.</div></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Kuadran Flow Simulator -->
+        <section id="kuadran-flow" class="scroll-mt-28">
+            <div class="mb-10">
+                <h2 class="text-3xl font-bold text-slate-900 flex items-center gap-3">
+                    <span class="text-3xl">🧭</span> Simulator Kuadran Flow
+                </h2>
+                <p class="text-slate-600 mt-3 text-lg max-w-4xl">
+                    Model Mihaly Csikszentmihalyi menunjukkan bahwa kondisi psikologis siswa sangat bergantung pada rasio <strong>Tantangan Tugas</strong> vs <strong>Keterampilan Siswa</strong>. Klik area pada grafik atau geser *slider* untuk mendiagnosis patologi kelas.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 bg-white p-8 rounded-3xl shadow-sm border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-bold text-xl mb-2 text-slate-800">Modulator Psikologis</h3>
+                        <p class="text-sm text-slate-500 mb-8">Posisikan siswa untuk melihat respon kognitif mereka.</p>
+                        
+                        <div class="space-y-8">
+                            <div>
+                                <div class="flex justify-between items-end mb-3">
+                                    <label class="font-bold text-slate-700 text-sm">Tingkat Keterampilan</label>
+                                    <span id="skill-val" class="font-mono bg-slate-100 px-2 py-1 rounded text-xs font-bold text-slate-700">50</span>
+                                </div>
+                                <input type="range" id="skill-slider" min="0" max="100" value="50">
+                                <div class="flex justify-between text-[10px] text-slate-400 font-bold uppercase mt-1"><span>Pemula</span><span>Ahli</span></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-end mb-3">
+                                    <label class="font-bold text-slate-700 text-sm">Tingkat Tantangan Tugas</label>
+                                    <span id="challenge-val" class="font-mono bg-slate-100 px-2 py-1 rounded text-xs font-bold text-slate-700">50</span>
+                                </div>
+                                <input type="range" id="challenge-slider" min="0" max="100" value="50">
+                                <div class="flex justify-between text-[10px] text-slate-400 font-bold uppercase mt-1"><span>Sangat Mudah</span><span>Terlalu Sulit</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-10 p-5 rounded-2xl border transition-all-ease" id="state-feedback-box">
+                        <div class="text-xs font-bold uppercase tracking-wider mb-2" id="state-title">Status Siswa</div>
+                        <div class="text-2xl font-bold mb-3" id="state-name">Menganalisis...</div>
+                        <p class="text-sm text-slate-600 leading-relaxed" id="state-desc"></p>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2">
+                    <div class="chart-container flex items-center justify-center p-2 md:p-6" style="background-color: #f8fafc; border: 1px solid #cbd5e1;">
+                        <canvas id="flowChart"></canvas>
+                    </div>
+                    <p class="text-center text-xs text-slate-500 mt-3 font-medium italic">💡 Tips: Anda dapat mengklik langsung pada area grafik di atas untuk memindahkan posisi siswa.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Ergonomi Kognitif -->
+        <section id="ergonomi" class="scroll-mt-28">
+            <div class="mb-10">
+                <h2 class="text-3xl font-bold text-slate-900 flex items-center gap-3">
+                    <span class="text-3xl">⚖️</span> Ergonomi Kognitif (J. Sweller)
+                </h2>
+                <p class="text-slate-600 mt-3 text-lg max-w-4xl">
+                    Kapasitas *Working Memory* manusia terbatas (Zero-sum game). Tugas Arsitek Kognitif adalah meminimalkan "kebisingan" visual/desain agar otak dapat mengalokasikan sisa kapasitas untuk pemahaman materi.
+                </p>
+            </div>
+
+            <div class="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-200">
+                <h3 class="font-bold text-xl mb-8 text-center text-slate-800">Visualisasi Kapasitas Memori Kerja (Total Maks 100%)</h3>
+                
+                <!-- Visual Stacked Bar -->
+                <div class="h-14 w-full flex rounded-2xl overflow-hidden shadow-inner mb-10 bg-slate-100 border border-slate-300">
+                    <div id="bar-intrinsic" class="h-full bg-slate-700 flex items-center justify-center text-white text-xs md:text-sm font-bold transition-all-ease whitespace-nowrap overflow-hidden" style="width: 30%">Intrinsik (30%)</div>
+                    <div id="bar-extraneous" class="h-full bg-red-500 flex items-center justify-center text-white text-xs md:text-sm font-bold transition-all-ease whitespace-nowrap overflow-hidden" style="width: 50%">Extraneous (50%)</div>
+                    <div id="bar-germane" class="h-full bg-emerald-500 flex items-center justify-center text-white text-xs md:text-sm font-bold transition-all-ease whitespace-nowrap overflow-hidden" style="width: 20%">Germane (20%)</div>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6 md:gap-8">
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 shadow-sm">
+                        <label class="font-bold text-slate-800 flex items-center gap-2 mb-3"><span>📐</span> Beban Intrinsik</label>
+                        <p class="text-xs text-slate-500 mb-6 h-12 leading-relaxed">Tingkat kesulitan bawaan dari konsep materi. Tidak bisa dihilangkan, hanya bisa dipecah (chunking).</p>
+                        <input type="range" id="load-intrinsic" min="10" max="70" value="30">
+                    </div>
+                    <div class="p-5 bg-red-50 rounded-2xl border border-red-200 shadow-sm relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-16 h-16 bg-red-100 rounded-full blur-xl -mr-8 -mt-8 pointer-events-none"></div>
+                        <label class="font-bold text-red-800 flex items-center gap-2 mb-3 relative z-10"><span>🗑️</span> Beban Extraneous</label>
+                        <p class="text-xs text-red-700/80 mb-6 h-12 leading-relaxed relative z-10">Desain UI yang buruk, instruksi rumit, jargon tak perlu. <br><strong>Geser untuk melihat dampaknya!</strong></p>
+                        <input type="range" id="load-extraneous" min="0" max="80" value="50" class="relative z-10">
+                    </div>
+                    <div class="p-5 bg-emerald-50 rounded-2xl border border-emerald-200 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <label class="font-bold text-emerald-800 flex items-center gap-2 mb-3"><span>💡</span> Beban Germane</label>
+                            <p class="text-xs text-emerald-700/80 leading-relaxed">Sisa ruang komputasi otak yang tersedia untuk <em>Meaning-Making</em> (belajar). (Dihitung otomatis)</p>
+                        </div>
+                        <div class="text-4xl font-mono font-extrabold text-emerald-600 mt-4 text-center" id="load-germane-val">20%</div>
+                    </div>
+                </div>
+                
+                <div class="mt-10 p-5 bg-indigo-50 text-indigo-900 rounded-xl text-sm border border-indigo-200 flex gap-4 items-start">
+                    <span class="text-2xl">⚠️</span>
+                    <p class="leading-relaxed font-medium"><strong>Hukum Ergonomi Kognitif:</strong> Jika Anda membiarkan Beban Extraneous (warna merah) terlalu besar akibat antarmuka yang berantakan, Beban Germane (hijau) akan menyusut hingga nol. Siswa <strong>tidak akan belajar apapun</strong> karena memori kerja mereka <em>overload</em> memproses desain, bukan memproses materi.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Laboratorium Konstruksionis (Numerasi & Literasi) -->
+        <section id="laboratorium" class="scroll-mt-28 space-y-12">
+            
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="text-3xl font-bold text-slate-900 flex items-center justify-center gap-3">
+                    <span class="text-3xl">🔬</span> Laboratorium Konstruksionis
+                </h2>
+                <p class="text-slate-600 mt-4 text-lg leading-relaxed">
+                    Berdasarkan gagasan Seymour Papert (Konstruksionisme), pembelajaran mutlak membutuhkan <strong>Otonomi</strong> dan <strong>Umpan Balik Segera</strong>. Berhenti menyuapi siswa dengan teori pasif statis.
+                </p>
+            </div>
+
+            <!-- Numeracy Tool -->
+            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-slate-900 text-white p-5 px-8 flex items-center gap-3">
+                    <span class="text-2xl">📊</span>
+                    <h3 class="font-bold text-lg md:text-xl tracking-wide">Modul Numerasi: Simulator Umpan Balik Instan</h3>
+                </div>
+                <div class="p-6 lg:p-10 grid lg:grid-cols-12 gap-10">
+                    <div class="lg:col-span-4 space-y-8">
+                        <p class="text-sm text-slate-600 leading-relaxed border-l-4 border-indigo-500 pl-4">Matematika bukan hafalan mati. Izinkan siswa mengubah variabel (<span class="font-mono bg-slate-100 px-1 rounded text-xs font-bold text-slate-700">P, r, t</span>) secara mandiri dan melihat perubahan kurva secara <em>real-time</em> untuk membangun pengenalan pola.</p>
+                        
+                        <div class="space-y-6 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Durasi (Tahun) <span class="text-indigo-600 lowercase">[t]</span></label>
+                                    <span class="font-mono text-base font-bold text-indigo-700 bg-white px-2 py-0.5 rounded shadow-sm" id="num-t-val">10</span>
+                                </div>
+                                <input type="range" id="num-t" min="1" max="30" value="10">
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Laju Pertumbuhan <span class="text-indigo-600 lowercase">[%]</span></label>
+                                    <span class="font-mono text-base font-bold text-indigo-700 bg-white px-2 py-0.5 rounded shadow-sm" id="num-r-val">5%</span>
+                                </div>
+                                <input type="range" id="num-r" min="1" max="25" value="5">
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Basis Nilai <span class="text-indigo-600 lowercase">[P]</span></label>
+                                    <span class="font-mono text-base font-bold text-indigo-700 bg-white px-2 py-0.5 rounded shadow-sm" id="num-p-val">1,000</span>
+                                </div>
+                                <input type="range" id="num-p" min="100" max="10000" step="100" value="1000">
+                            </div>
+                        </div>
+
+                        <div class="pt-6 border-t border-slate-200">
+                            <div class="text-xs font-bold text-slate-400 uppercase mb-2 tracking-widest">Kalkulasi Eksponensial: <span class="font-mono text-slate-800 bg-slate-100 px-2 py-1 rounded ml-1">A = P(1+r)^t</span></div>
+                            <div class="text-4xl md:text-5xl font-mono font-black text-slate-900 tracking-tight" id="num-result">1,629</div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-8 flex flex-col justify-center">
+                        <div class="chart-container w-full" style="background-color: #ffffff; border: none; box-shadow: none;">
+                            <canvas id="numeracyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Literacy Tool -->
+            <div class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden mt-10">
+                <div class="bg-indigo-900 text-white p-5 px-8 flex justify-between items-center flex-wrap gap-4 border-b border-indigo-800">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">📖</span>
+                        <h3 class="font-bold text-lg md:text-xl tracking-wide">Modul Literasi: Modulator Densitas Leksikal</h3>
+                    </div>
+                    <div class="flex gap-2 bg-indigo-950 p-1 rounded-xl">
+                        <button onclick="setLiteracyLevel(1)" id="btn-lit-1" class="px-4 py-2 bg-white text-indigo-900 text-xs font-bold rounded-lg shadow-sm transition-all transform scale-105">Level 1 (Pemula)</button>
+                        <button onclick="setLiteracyLevel(2)" id="btn-lit-2" class="px-4 py-2 text-indigo-200 hover:text-white hover:bg-indigo-800 text-xs font-bold rounded-lg transition-all">Level 2 (ZPD)</button>
+                        <button onclick="setLiteracyLevel(3)" id="btn-lit-3" class="px-4 py-2 text-indigo-200 hover:text-white hover:bg-indigo-800 text-xs font-bold rounded-lg transition-all">Level 3 (Jargon Ahli)</button>
+                    </div>
+                </div>
+                <div class="p-6 lg:p-10 grid md:grid-cols-2 gap-10 items-start bg-slate-50">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                            <h4 class="font-bold text-slate-800 flex items-center gap-2"><span class="text-indigo-500">📝</span> Teks Simulasi Siswa</h4>
+                            <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-lg">
+                                <button onclick="toggleFont('sans')" id="font-sans" class="px-3 py-1.5 bg-white shadow-sm rounded-md text-xs font-bold text-slate-800 transition-colors">Sans</button>
+                                <button onclick="toggleFont('serif')" id="font-serif" class="px-3 py-1.5 hover:bg-slate-200 rounded-md text-xs font-medium text-slate-500 transition-colors">Serif</button>
+                                <button onclick="toggleFont('mono')" id="font-mono" class="px-3 py-1.5 hover:bg-slate-200 rounded-md text-xs font-mono font-medium text-slate-500 transition-colors">Mono</button>
+                            </div>
+                        </div>
+                        <div id="literacy-text" class="text-slate-800 text-lg leading-loose transition-all-ease font-sans min-h-[220px]">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                    
+                    <div class="bg-amber-50 p-8 rounded-2xl border border-amber-200 h-full flex flex-col justify-between shadow-sm">
+                        <div>
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="text-5xl bg-white p-3 rounded-full shadow-sm" id="lit-icon">😌</div>
+                                <div>
+                                    <h4 class="font-bold text-amber-900 text-xl tracking-tight">Audit Kognitif Flow</h4>
+                                    <span class="text-xs font-bold uppercase tracking-widest text-amber-600" id="lit-level-badge">Level 1</span>
+                                </div>
+                            </div>
+                            <p id="literacy-analysis" class="text-base text-amber-800 leading-relaxed font-medium">
+                                <!-- Injected by JS -->
+                            </p>
+                        </div>
+                        <div class="mt-8 bg-white/60 p-4 rounded-xl text-xs text-amber-900 font-medium border border-amber-200/60 leading-relaxed">
+                            <strong>Prinsip Tipografi:</strong> Gunakan font <em>Serif</em> untuk membaca teks narasi panjang (membantu <em>saccades</em> mata), dan font <em>Mono-sans</em> untuk presisi data/kode. Memaksakan kompleksitas leksikal (Level 3) hanya akan mematikan memori kerja tanpa meningkatkan pemahaman.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center py-12 border-t border-slate-200 mt-20">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">Evolusi Arsitek Kognitif</h2>
+            <p class="text-slate-500 max-w-2xl mx-auto mb-8 leading-relaxed">
+                Ekosistem pendidikan bukan produk statis; ia adalah sistem hidup. Mengajar bukanlah menceramahi dari depan kelas, melainkan terus-menerus memodifikasi struktur lingkungan (Agile Syllabus) agar siswa tetap berselancar di dalam zona <em>Flow</em>.
+            </p>
+            <p class="text-xs font-bold tracking-widest uppercase text-slate-400">Toolkit Arsitektur Pedagogi © 2026</p>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- Core State & Utilities ---
+        const State = {
+            flow: { challenge: 50, skill: 50 },
+            cogLoad: { intrinsic: 30, extraneous: 50 },
+            numeracy: { p: 1000, r: 5, t: 10 },
+            literacy: { level: 1, font: 'sans' }
+        };
+
+        const formatNumber = (num) => new Intl.NumberFormat('id-ID').format(Math.round(num));
+
+        // --- 1. Flow Quadrant Logic (Chart.js) ---
+        let flowChart;
+
+        const quadrantBackgroundPlugin = {
+            id: 'quadrantBackground',
+            beforeDraw: (chart) => {
+                const { ctx, chartArea: { top, bottom, left, right }, scales: { x, y } } = chart;
+                const midX = x.getPixelForValue(50);
+                const midY = y.getPixelForValue(50);
+
+                ctx.save();
+                
+                // Subtle colored backgrounds
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.05)'; // Anxiety (Red)
+                ctx.fillRect(left, top, midX - left, midY - top);
+                
+                ctx.fillStyle = 'rgba(79, 70, 229, 0.05)'; // Flow (Indigo)
+                ctx.fillRect(midX, top, right - midX, midY - top);
+                
+                ctx.fillStyle = 'rgba(148, 163, 184, 0.05)'; // Apathy (Slate)
+                ctx.fillRect(left, midY, midX - left, bottom - midY);
+                
+                ctx.fillStyle = 'rgba(245, 158, 11, 0.05)'; // Boredom (Amber)
+                ctx.fillRect(midX, midY, right - midX, bottom - midY);
+                
+                // Diagonal Flow Channel
+                ctx.beginPath();
+                ctx.moveTo(left, bottom - (bottom-top)*0.2);
+                ctx.lineTo(right - (right-left)*0.2, top);
+                ctx.lineTo(right, top + (bottom-top)*0.2);
+                ctx.lineTo(left + (right-left)*0.2, bottom);
+                ctx.fillStyle = 'rgba(79, 70, 229, 0.04)';
+                ctx.fill();
+
+                // Axis Lines (Crosshair)
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(15, 23, 42, 0.1)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.moveTo(midX, top);
+                ctx.lineTo(midX, bottom);
+                ctx.moveTo(left, midY);
+                ctx.lineTo(right, midY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Background Text Labels
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.25)';
+                ctx.font = 'bold 13px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('KECEMASAN', left + (midX-left)/2, top + 35);
+                ctx.fillText('FLOW STATE', midX + (right-midX)/2, top + 35);
+                ctx.fillText('APATIS', left + (midX-left)/2, bottom - 25);
+                ctx.fillText('KEBOSANAN', midX + (right-midX)/2, bottom - 25);
+                
+                ctx.restore();
+            }
+        };
+
+        function initFlowChart() {
+            const ctx = document.getElementById('flowChart').getContext('2d');
+            Chart.register(quadrantBackgroundPlugin);
+
+            flowChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Posisi Siswa',
+                        data: [{ x: State.flow.skill, y: State.flow.challenge }],
+                        backgroundColor: '#4f46e5', // indigo-600
+                        borderColor: '#ffffff',
+                        borderWidth: 4,
+                        pointRadius: 10,
+                        pointHoverRadius: 14,
+                        shadowOffsetX: 0,
+                        shadowOffsetY: 4,
+                        shadowBlur: 10,
+                        shadowColor: 'rgba(0,0,0,0.3)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 250 },
+                    onClick: (e) => {
+                        const canvasPosition = Chart.helpers.getRelativePosition(e, flowChart);
+                        // Safely clamp values between 0 and 100 in case click is on margin padding
+                        const dataX = Math.max(0, Math.min(100, Math.round(flowChart.scales.x.getValueForPixel(canvasPosition.x))));
+                        const dataY = Math.max(0, Math.min(100, Math.round(flowChart.scales.y.getValueForPixel(canvasPosition.y))));
+                        
+                        document.getElementById('skill-slider').value = dataX;
+                        document.getElementById('challenge-slider').value = dataY;
+                        updateFlowState();
+                    },
+                    scales: {
+                        x: {
+                            min: 0, max: 100,
+                            grid: { display: false },
+                            title: { display: true, text: 'Keterampilan Siswa (Skill) ➔', font: {weight: 'bold', size: 12} }
+                        },
+                        y: {
+                            min: 0, max: 100,
+                            grid: { display: false },
+                            title: { display: true, text: 'Tantangan Tugas (Challenge) ➔', font: {weight: 'bold', size: 12} }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            padding: 10,
+                            titleFont: { size: 13 },
+                            bodyFont: { size: 14, weight: 'bold' },
+                            callbacks: { label: (ctx) => `Skill: ${ctx.parsed.x} | Tantangan: ${ctx.parsed.y}` }
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('skill-slider').addEventListener('input', updateFlowState);
+            document.getElementById('challenge-slider').addEventListener('input', updateFlowState);
+            updateFlowState(); // Init
+        }
+
+        function updateFlowState() {
+            const skill = parseInt(document.getElementById('skill-slider').value);
+            const challenge = parseInt(document.getElementById('challenge-slider').value);
+            
+            document.getElementById('skill-val').innerText = skill;
+            document.getElementById('challenge-val').innerText = challenge;
+
+            flowChart.data.datasets[0].data = [{ x: skill, y: challenge }];
+            
+            let stateName, stateDesc, boxClass, titleColor;
+            
+            if (challenge > 55 && skill > 55 && Math.abs(challenge - skill) <= 20) {
+                stateName = "🌊 Flow State";
+                stateDesc = "Kondisi pembelajaran optimal. Siswa sangat fokus, termotivasi secara intrinsik, dan kehilangan kesadaran akan waktu (Meaning-making maksimal).";
+                boxClass = "bg-indigo-50 border-indigo-200"; titleColor = "text-indigo-800";
+                flowChart.data.datasets[0].backgroundColor = "#4f46e5";
+            } else if (challenge > 50 && skill <= 50) {
+                stateName = "🔴 Kecemasan (Anxiety)";
+                stateDesc = "Tugas kognitif terlalu sulit. Sistem limbik (amigdala) merespons ini sebagai ancaman. Siswa mengalami blokade mental dan berpotensi menyerah.";
+                boxClass = "bg-red-50 border-red-200"; titleColor = "text-red-800";
+                flowChart.data.datasets[0].backgroundColor = "#ef4444";
+            } else if (challenge <= 50 && skill > 50) {
+                stateName = "🟡 Kebosanan (Boredom)";
+                stateDesc = "Tugas terlampau repetitif dan tidak menantang (under-stimulation). Motivasi intrinsik mati dan siswa akan mulai mencari distraksi eksternal.";
+                boxClass = "bg-amber-50 border-amber-200"; titleColor = "text-amber-800";
+                flowChart.data.datasets[0].backgroundColor = "#f59e0b";
+            } else {
+                stateName = "⚪ Apatis (Apathy)";
+                stateDesc = "Titik krisis terendah. Siswa hadir secara fisik namun sepenuhnya absen secara kognitif. Tidak ada keterampilan yang diasah maupun tantangan yang dipecahkan.";
+                boxClass = "bg-slate-100 border-slate-300"; titleColor = "text-slate-800";
+                flowChart.data.datasets[0].backgroundColor = "#64748b";
+            }
+
+            const box = document.getElementById('state-feedback-box');
+            box.className = `mt-10 p-6 rounded-2xl border transition-all-ease shadow-sm ${boxClass}`;
+            document.getElementById('state-title').className = `text-xs font-bold uppercase tracking-widest mb-2 ${titleColor}`;
+            document.getElementById('state-name').innerText = stateName;
+            document.getElementById('state-desc').innerText = stateDesc;
+            
+            flowChart.update();
+        }
+
+        // --- 2. Cognitive Load Logic ---
+        function initCognitiveLoadSimulator() {
+            const intSlider = document.getElementById('load-intrinsic');
+            const extSlider = document.getElementById('load-extraneous');
+
+            const updateBars = () => {
+                let intrinsic = parseInt(intSlider.value);
+                let extraneous = parseInt(extSlider.value);
+                
+                // Prevent exceeding 100% physically feeling like a constraint
+                if (intrinsic + extraneous > 100) {
+                    extraneous = 100 - intrinsic;
+                    extSlider.value = extraneous;
+                }
+                
+                let germane = 100 - (intrinsic + extraneous);
+
+                // Update Visual Widths
+                const intBar = document.getElementById('bar-intrinsic');
+                const extBar = document.getElementById('bar-extraneous');
+                const gerBar = document.getElementById('bar-germane');
+                
+                intBar.style.width = `${intrinsic}%`;
+                extBar.style.width = `${extraneous}%`;
+                gerBar.style.width = `${germane}%`;
+
+                // Smart Text Overflow handling (Hide text if bar is too thin)
+                intBar.innerText = intrinsic >= 15 ? `Intrinsik (${intrinsic}%)` : '';
+                extBar.innerText = extraneous >= 15 ? `Extraneous (${extraneous}%)` : '';
+                gerBar.innerText = germane >= 15 ? `Germane (${germane}%)` : '';
+                
+                // Update Germane Status Number
+                const germaneVal = document.getElementById('load-germane-val');
+                germaneVal.innerText = `${germane}%`;
+                
+                if(germane <= 5) {
+                    germaneVal.classList.replace('text-emerald-600', 'text-red-600');
+                    gerBar.classList.replace('bg-emerald-500', 'bg-red-600');
+                } else {
+                    germaneVal.classList.replace('text-red-600', 'text-emerald-600');
+                    gerBar.classList.replace('bg-red-600', 'bg-emerald-500');
+                }
+            };
+
+            intSlider.addEventListener('input', updateBars);
+            extSlider.addEventListener('input', updateBars);
+            updateBars(); // Init
+        }
+
+        // --- 3. Numeracy Lab (Chart.js Line) ---
+        let numeracyChart;
+
+        function initNumeracySimulator() {
+            const ctx = document.getElementById('numeracyChart').getContext('2d');
+            
+            // Create a nice gradient fill for the chart area
+            let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(79, 70, 229, 0.4)'); // Indigo 600
+            gradient.addColorStop(1, 'rgba(79, 70, 229, 0.0)');
+
+            numeracyChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: [], datasets: [{
+                    label: 'Nilai Akumulasi',
+                    data: [],
+                    borderColor: '#4f46e5', // Indigo 600
+                    backgroundColor: gradient,
+                    borderWidth: 4,
+                    fill: true,
+                    tension: 0.4, // Smooth curves
+                    pointRadius: 0,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#4f46e5',
+                    pointBorderWidth: 3
+                }]},
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            padding: 12,
+                            titleFont: { size: 13, family: "'Inter', sans-serif" },
+                            bodyFont: { size: 16, weight: 'bold', family: "'JetBrains Mono', monospace" },
+                            callbacks: { label: (ctx) => `Rp ${formatNumber(ctx.parsed.y)}` }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            border: { display: false },
+                            grid: { color: '#f1f5f9', drawBorder: false }, 
+                            ticks: { 
+                                font: {family: "'JetBrains Mono', monospace", size: 11},
+                                color: '#64748b',
+                                callback: function(value) {
+                                    if(value >= 1000) return value / 1000 + 'k';
+                                    return value;
+                                }
+                            } 
+                        },
+                        x: { 
+                            grid: { display: false },
+                            ticks: { font: {size: 11}, color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+
+            const updateMath = () => {
+                const P = parseInt(document.getElementById('num-p').value);
+                const r = parseInt(document.getElementById('num-r').value) / 100;
+                const t = parseInt(document.getElementById('num-t').value);
+
+                document.getElementById('num-p-val').innerText = formatNumber(P);
+                document.getElementById('num-r-val').innerText = `${(r*100)}%`;
+                document.getElementById('num-t-val').innerText = t;
+
+                let labels = [];
+                let dataPoints = [];
+                
+                for(let year = 0; year <= t; year++) {
+                    labels.push(`Th ${year}`);
+                    let amount = P * Math.pow((1 + r), year);
+                    dataPoints.push(amount);
+                }
+
+                const finalResult = dataPoints[dataPoints.length - 1];
+                document.getElementById('num-result').innerText = formatNumber(finalResult);
+
+                numeracyChart.data.labels = labels;
+                numeracyChart.data.datasets[0].data = dataPoints;
+                numeracyChart.update();
+            };
+
+            document.getElementById('num-p').addEventListener('input', updateMath);
+            document.getElementById('num-r').addEventListener('input', updateMath);
+            document.getElementById('num-t').addEventListener('input', updateMath);
+            updateMath();
+        }
+
+        // --- 4. Literacy Lab (DOM Updates) ---
+        const literacyData = {
+            1: {
+                title: "Level 1 (Pemula)",
+                text: "Bumi adalah planet tempat kita tinggal. Planet ini mengelilingi matahari yang sangat panas. Bumi memiliki banyak air, tanah yang subur, dan udara segar yang membuat tanaman dan hewan bisa tumbuh. Kita harus selalu menjaga bumi agar tetap bersih dan aman.",
+                analysis: "<strong>ZPD Sesuai:</strong> Kalimat menggunakan struktur deklaratif sederhana dan kosakata fundamental (umum). Beban kognitif intrinsik sangat rendah. Ini memungkinkan memori kerja pemula memproses teks dengan lancar tanpa hambatan leksikal (Memicu rasa pencapaian/Flow awal).",
+                icon: "😌", color: "text-amber-900", boxClass: "bg-amber-50 border-amber-200", badgeColor: "text-amber-700 bg-amber-100"
+            },
+            2: {
+                title: "Level 2 (ZPD Menengah)",
+                text: "Bumi merupakan salah satu bagian dari sistem tata surya yang secara konsisten mengorbit pada bintang induknya, Matahari. Keberadaan atmosfer yang cukup tebal dan air dalam fase cair menjadikannya satu-satunya planet yang diketahui mampu menopang kehidupan biosfer secara berkelanjutan.",
+                analysis: "<strong>Tantangan Dinamis:</strong> Pengenalan istilah akademis konteksual ('mengorbit', 'biosfer', 'fase cair'). Cocok diberikan saat kemampuan <em>decoding</em> pembaca sudah mapan. Merangsang kerja kognitif tingkat lanjut (*Germane Load* tinggi) untuk menjangkau pemahaman spasial tata surya.",
+                icon: "🤔", color: "text-indigo-900", boxClass: "bg-indigo-50 border-indigo-200", badgeColor: "text-indigo-700 bg-indigo-100"
+            },
+            3: {
+                title: "Level 3 (Jargon Ahli)",
+                text: "Eksistensi terestrial dalam kerangka sistem heliosentris mengimplikasikan adanya ekuilibrium termodinamika yang difasilitasi oleh selubung gas hidrodinamik konstan. Preservasi hidro-kriosfer ini merupakan pra-kondisi absolut demi menyokong kelangsungan metabolisme entitas organisme berbasis molekul karbon.",
+                analysis: "<strong>Extraneous Load Maksimal:</strong> Penggunaan jargon linguistik kompleks ('terestrial', 'ekuilibrium termodinamika') untuk konsep yang sederhana. Ini secara harfiah mematikan proses <em>meaning-making</em>. Memori kerja langsung mengalami <em>overload</em> dan pembaca terlempar ke zona Frustrasi/Kecemasan.",
+                icon: "🤯", color: "text-red-900", boxClass: "bg-red-50 border-red-200", badgeColor: "text-red-700 bg-red-100"
+            }
+        };
+
+        function setLiteracyLevel(level) {
+            State.literacy.level = level;
+            
+            // Buttons UI Update
+            [1, 2, 3].forEach(i => {
+                const btn = document.getElementById(`btn-lit-${i}`);
+                if(i === level) {
+                    btn.className = "px-4 py-2 bg-white text-indigo-900 text-xs font-bold rounded-lg shadow-sm transition-all transform scale-105";
+                } else {
+                    btn.className = "px-4 py-2 text-indigo-200 hover:text-white hover:bg-indigo-800 text-xs font-bold rounded-lg transition-all";
+                }
+            });
+
+            // Text and Analysis Update with subtle fade
+            const data = literacyData[level];
+            const textEl = document.getElementById('literacy-text');
+            textEl.style.opacity = 0;
+            
+            setTimeout(() => {
+                textEl.innerText = data.text;
+                
+                const analysisContainer = document.getElementById('literacy-analysis').parentElement.parentElement;
+                analysisContainer.className = `p-8 rounded-2xl border h-full flex flex-col justify-between shadow-sm transition-all-ease ${data.boxClass}`;
+                
+                document.getElementById('literacy-analysis').innerHTML = data.analysis;
+                document.getElementById('literacy-analysis').className = `text-base leading-relaxed font-medium mt-4 ${data.color}`;
+                
+                document.getElementById('lit-level-badge').innerText = data.title;
+                document.getElementById('lit-level-badge').className = `text-xs font-bold uppercase tracking-widest px-2 py-1 rounded ${data.badgeColor}`;
+                
+                document.getElementById('lit-icon').innerText = data.icon;
+                
+                textEl.style.opacity = 1;
+            }, 150);
+        }
+
+        function toggleFont(fontType) {
+            State.literacy.font = fontType;
+            const textEl = document.getElementById('literacy-text');
+            
+            // Buttons UI Update
+            ['sans', 'serif', 'mono'].forEach(f => {
+                document.getElementById(`font-${f}`).className = `px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${f==='mono'?'font-mono':''} ${fontType === f ? 'bg-white shadow-sm font-bold text-slate-800' : 'hover:bg-slate-200 text-slate-500'}`;
+            });
+
+            // Apply specific font classes
+            let fontClass = 'font-sans';
+            if(fontType === 'serif') fontClass = 'font-serif';
+            if(fontType === 'mono') fontClass = 'font-mono tracking-tight';
+
+            textEl.className = `text-slate-800 text-lg leading-loose transition-all-ease min-h-[220px] ${fontClass}`;
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initFlowChart();
+            initCognitiveLoadSimulator();
+            initNumeracySimulator();
+            setLiteracyLevel(1); 
+        });
+
+    </script>
+</body>
+</html>
