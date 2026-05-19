@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Diagnostik Kognitif Guru - TI UNIMMA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 50vh;
+            min-height: 400px;
+            max-height: 500px;
+        }
+
+        /* Custom Scrollbar for table */
+        .table-scroll::-webkit-scrollbar { width: 6px; }
+        .table-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+        .table-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .table-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .selected-row {
+            background-color: #f1f5f9;
+            border-left: 4px solid #3b82f6;
+        }
+    </style>
+</head>
+<body class="antialiased p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto space-y-6">
+        
+        <!-- Institusi / Brand Header -->
+        <div class="flex items-center gap-4 px-2 pt-2 md:pt-0 mb-4">
+            <img src="https://lh3.googleusercontent.com/d/1zzEmoTmvTPSDHDCe7HU96TPfsZK2Bjqd" alt="Logo Teknologi Informasi UNIMMA" class="h-12 md:h-14 w-auto object-contain drop-shadow-sm">
+            <h2 class="font-extrabold text-slate-800 text-xl md:text-2xl tracking-tight">Teknologi Informasi UNIMMA</h2>
+        </div>
+
+        <!-- Header -->
+        <header class="bg-white rounded-[2rem] p-6 md:p-8 shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="text-3xl text-blue-600">📊</span>
+                    <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Dashboard Diagnostik Kelas</h1>
+                </div>
+                <p class="text-slate-500 text-sm md:text-base max-w-2xl">
+                    Petakan posisi kognitif siswa berdasarkan <strong>Nilai Pre-test (Skill)</strong> dan <strong>Target Soal (Tantangan)</strong>. Sistem akan memberikan rekomendasi intervensi pedagogis otomatis.
+                </p>
+            </div>
+            <button onclick="loadDemoData()" class="px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-bold text-sm rounded-lg border border-indigo-200 transition-colors shadow-sm whitespace-nowrap">
+                ✨ Muat Data Demo
+            </button>
+        </header>
+
+        <div class="grid lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Left Panel: Input & Table -->
+            <div class="lg:col-span-5 space-y-6">
+                
+                <!-- Input Form -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <h2 class="font-bold text-lg text-slate-800 mb-4 flex items-center gap-2">
+                        <span>➕</span> Tambah Data Siswa
+                    </h2>
+                    <form id="addStudentForm" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Nama Siswa</label>
+                            <input type="text" id="inputName" required placeholder="Contoh: Budi Santoso" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Pre-test (X)</label>
+                                <input type="number" id="inputSkill" required min="0" max="100" placeholder="0-100" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Target Soal (Y)</label>
+                                <input type="number" id="inputChallenge" required min="0" max="100" placeholder="0-100" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-sm">
+                            Simpan ke Peta
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Student List Table -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col h-[400px]">
+                    <div class="p-4 border-b border-slate-200 bg-slate-50">
+                        <h2 class="font-bold text-sm text-slate-700 uppercase tracking-wider">Daftar Siswa (<span id="studentCount">0</span>)</h2>
+                    </div>
+                    <div class="overflow-y-auto table-scroll flex-1 p-2">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-xs text-slate-400 border-b border-slate-100">
+                                    <th class="p-2 font-semibold">Nama</th>
+                                    <th class="p-2 font-semibold text-center">X</th>
+                                    <th class="p-2 font-semibold text-center">Y</th>
+                                    <th class="p-2 font-semibold text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentTableBody" class="text-sm text-slate-700">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                        <div id="emptyState" class="text-center py-10 text-slate-400 text-sm">
+                            Belum ada data siswa.<br>Silakan tambahkan data di atas.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Chart & Analysis -->
+            <div class="lg:col-span-7 space-y-6">
+                
+                <!-- Visualization -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="font-bold text-lg text-slate-800">Sebaran Kelas (Kuadran Flow)</h2>
+                        <span class="text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">Klik titik/tabel untuk detail</span>
+                    </div>
+                    <div class="chart-container rounded-xl overflow-hidden border border-slate-100">
+                        <canvas id="classFlowChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recommendation Card -->
+                <div id="analysisCard" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 opacity-50 transition-opacity duration-300 pointer-events-none">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Fokus Analisis</p>
+                            <h3 id="detailName" class="text-xl font-bold text-slate-800">Pilih Siswa...</h3>
+                        </div>
+                        <div id="detailZoneBadge" class="px-3 py-1 rounded text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-500">
+                            -
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1"><span>🔍</span> Diagnosa Kelas</h4>
+                            <p id="detailDiagnosis" class="text-sm text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100 min-h-[80px]">
+                                Belum ada siswa terpilih.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1"><span>🛠️</span> Rekomendasi (Tindakan)</h4>
+                            <p id="detailAction" class="text-sm font-medium leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100 min-h-[80px] text-slate-600">
+                                Belum ada siswa terpilih.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- State Management ---
+        let students = [];
+        let selectedIndex = null;
+        let classChart;
+
+        // --- Core Logic & Rules ---
+        const ZONES = {
+            ANXIETY: { 
+                id: 'anxiety', name: 'Kecemasan', type: 'Scaffolding (Bantuan)', color: '#f43f5e', 
+                bgCard: 'bg-rose-50', borderCard: 'border-rose-200', textTitle: 'text-rose-700', badge: 'bg-rose-100 text-rose-700',
+                diagnosis: "Tantangan jauh melampaui kemampuan dasar siswa. Siswa berisiko mengalami *cognitive overload*, frustrasi, dan berujung pada *math anxiety* (menyerah).",
+                action: "Terapkan **Scaffolding**. Turunkan tingkat kesulitan seketika. Berikan alat bantu visual (blok aljabar) atau panduan langkah-demi-langkah hingga fondasi (Sumbu X) mereka menguat."
+            },
+            BOREDOM: { 
+                id: 'boredom', name: 'Kebosanan', type: 'Enrichment (Pengayaan)', color: '#f59e0b', 
+                bgCard: 'bg-amber-50', borderCard: 'border-amber-200', textTitle: 'text-amber-700', badge: 'bg-amber-100 text-amber-700',
+                diagnosis: "Keterampilan siswa jauh di atas tugas yang diberikan. Tugas terasa repetitif dan kurang menstimulasi (*under-stimulation*), memicu hilangnya motivasi intrinsik.",
+                action: "Terapkan **Enrichment**. Hentikan latihan berulang. Berikan tantangan tingkat tinggi (*open-ended problems*) atau proyek aplikasi dunia nyata agar mereka kembali terstimulasi secara intelektual."
+            },
+            APATHY: { 
+                id: 'apathy', name: 'Apatis', type: 'Engagement (Keterlibatan)', color: '#94a3b8', 
+                bgCard: 'bg-slate-50', borderCard: 'border-slate-200', textTitle: 'text-slate-700', badge: 'bg-slate-200 text-slate-700',
+                diagnosis: "Titik terendah secara psikologis. Siswa tidak memiliki keterampilan dasar dan tugas yang ada juga tidak memancing minat mereka. Kehadiran hanya secara fisik.",
+                action: "Mulai dari **Kejelasan Tujuan**. Hubungkan materi dengan minat personal siswa. Berikan target mikro yang sangat mudah dicapai dalam 5 menit pertama untuk memicu letupan dopamin awal."
+            },
+            FLOW: { 
+                id: 'flow', name: 'Flow State', type: 'Maintenance (Pemeliharaan)', color: '#0ea5e9', 
+                bgCard: 'bg-cyan-50', borderCard: 'border-cyan-200', textTitle: 'text-cyan-700', badge: 'bg-cyan-100 text-cyan-700',
+                diagnosis: "Kondisi ideal. Keterampilan dan Tantangan seimbang pada tingkat yang memadai. Siswa fokus penuh, autotelic, dan melakukan *meaning-making*.",
+                action: "Pertahankan momentum. Berikan **Umpan Balik Segera** jika mereka melenceng, namun hindari interupsi instruksional yang tidak perlu. Terus naikkan tantangan seiring bertambahnya keahlian mereka."
+            }
+        };
+
+        function getZone(skill, challenge) {
+            if (challenge > 50 && skill <= 50) return ZONES.ANXIETY;
+            if (challenge <= 50 && skill > 50) return ZONES.BOREDOM;
+            if (challenge <= 50 && skill <= 50) return ZONES.APATHY;
+            return ZONES.FLOW;
+        }
+
+        // --- Chart Initialization & Plugin ---
+        const quadrantPlugin = {
+            id: 'quadrantsBackground',
+            beforeDraw: (chart) => {
+                const { ctx, chartArea: { top, bottom, left, right }, scales: { x, y } } = chart;
+                const midX = x.getPixelForValue(50);
+                const midY = y.getPixelForValue(50);
+
+                ctx.save();
+                
+                // Colors
+                ctx.fillStyle = 'rgba(244, 63, 94, 0.05)'; // Rose (Anxiety)
+                ctx.fillRect(left, top, midX - left, midY - top);
+                ctx.fillStyle = 'rgba(14, 165, 233, 0.05)'; // Cyan (Flow)
+                ctx.fillRect(midX, top, right - midX, midY - top);
+                ctx.fillStyle = 'rgba(148, 163, 184, 0.05)'; // Slate (Apathy)
+                ctx.fillRect(left, midY, midX - left, bottom - midY);
+                ctx.fillStyle = 'rgba(245, 158, 11, 0.05)'; // Amber (Boredom)
+                ctx.fillRect(midX, midY, right - midX, bottom - midY);
+                
+                // Axis lines
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(15, 23, 42, 0.1)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([4, 4]);
+                ctx.moveTo(midX, top);
+                ctx.lineTo(midX, bottom);
+                ctx.moveTo(left, midY);
+                ctx.lineTo(right, midY);
+                ctx.stroke();
+
+                // Zone Labels Background
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.15)';
+                ctx.font = 'bold 12px "Plus Jakarta Sans"';
+                ctx.textAlign = 'center';
+                ctx.fillText('KECEMASAN', left + (midX-left)/2, top + 20);
+                ctx.fillText('FLOW STATE', midX + (right-midX)/2, top + 20);
+                ctx.fillText('APATIS', left + (midX-left)/2, bottom - 10);
+                ctx.fillText('KEBOSANAN', midX + (right-midX)/2, bottom - 10);
+
+                ctx.restore();
+            }
+        };
+
+        function initChart() {
+            const ctx = document.getElementById('classFlowChart').getContext('2d');
+            Chart.register(quadrantPlugin);
+
+            classChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Siswa',
+                        data: [], // Populated dynamically
+                        backgroundColor: [],
+                        borderColor: '#ffffff',
+                        borderWidth: 2,
+                        pointRadius: 8,
+                        pointHoverRadius: 12,
+                        hoverBorderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 400 },
+                    onClick: (e, activeElements) => {
+                        if (activeElements.length > 0) {
+                            const index = activeElements[0].index;
+                            selectStudent(index);
+                        } else {
+                            selectStudent(null);
+                        }
+                    },
+                    scales: {
+                        x: {
+                            min: 0, max: 100,
+                            title: { display: true, text: 'Nilai Pre-test (Skill) ➔', font: { weight: 'bold' } },
+                            grid: { display: false }
+                        },
+                        y: {
+                            min: 0, max: 100,
+                            title: { display: true, text: 'Target Kesulitan (Challenge) ➔', font: { weight: 'bold' } },
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1e293b',
+                            padding: 12,
+                            titleFont: { size: 13, family: "'Plus Jakarta Sans'" },
+                            bodyFont: { size: 14, weight: 'bold', family: "'Plus Jakarta Sans'" },
+                            displayColors: false,
+                            callbacks: {
+                                title: (ctx) => students[ctx[0].dataIndex].name,
+                                label: (ctx) => `Skill: ${ctx.parsed.x} | Target: ${ctx.parsed.y}`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Application Logic ---
+        function addStudent(e) {
+            e.preventDefault();
+            const nameInput = document.getElementById('inputName');
+            const skillInput = document.getElementById('inputSkill');
+            const challengeInput = document.getElementById('inputChallenge');
+
+            const name = nameInput.value.trim();
+            const skill = parseInt(skillInput.value);
+            const challenge = parseInt(challengeInput.value);
+
+            if (name && !isNaN(skill) && !isNaN(challenge)) {
+                const zone = getZone(skill, challenge);
+                students.push({ id: Date.now(), name, skill, challenge, zone });
+                
+                nameInput.value = '';
+                skillInput.value = '';
+                challengeInput.value = '';
+                nameInput.focus();
+
+                updateUI();
+                selectStudent(students.length - 1); // Auto-select newly added
+            }
+        }
+
+        function deleteStudent(index, event) {
+            event.stopPropagation(); // Prevent row click
+            students.splice(index, 1);
+            if (selectedIndex === index) selectStudent(null);
+            else if (selectedIndex > index) selectStudent(selectedIndex - 1);
+            updateUI();
+        }
+
+        function selectStudent(index) {
+            selectedIndex = index;
+            updateTableSelection();
+            updateChartHighlight();
+            updateAnalysisCard();
+        }
+
+        // --- UI Updates ---
+        function updateUI() {
+            document.getElementById('studentCount').innerText = students.length;
+            
+            // Toggle Empty State
+            document.getElementById('emptyState').style.display = students.length === 0 ? 'block' : 'none';
+            document.getElementById('studentTableBody').parentElement.style.display = students.length === 0 ? 'none' : 'table';
+
+            // Update Table
+            const tbody = document.getElementById('studentTableBody');
+            tbody.innerHTML = '';
+            students.forEach((s, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = `border-b border-slate-50 cursor-pointer hover:bg-slate-50 transition-colors ${selectedIndex === idx ? 'selected-row' : ''}`;
+                tr.onclick = () => selectStudent(idx);
+                
+                tr.innerHTML = `
+                    <td class="p-2 font-medium flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full" style="background-color: ${s.zone.color}"></div>
+                        ${s.name}
+                    </td>
+                    <td class="p-2 text-center font-mono">${s.skill}</td>
+                    <td class="p-2 text-center font-mono">${s.challenge}</td>
+                    <td class="p-2 text-center">
+                        <button onclick="deleteStudent(${idx}, event)" class="text-rose-500 hover:text-rose-700 p-1 rounded hover:bg-rose-50 transition-colors" title="Hapus">
+                            ✕
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Update Chart Data
+            classChart.data.datasets[0].data = students.map(s => ({ x: s.skill, y: s.challenge }));
+            classChart.data.datasets[0].backgroundColor = students.map(s => s.zone.color);
+            classChart.update();
+        }
+
+        function updateTableSelection() {
+            const rows = document.getElementById('studentTableBody').children;
+            for (let i = 0; i < rows.length; i++) {
+                if (i === selectedIndex) {
+                    rows[i].classList.add('selected-row');
+                } else {
+                    rows[i].classList.remove('selected-row');
+                }
+            }
+        }
+
+        function updateChartHighlight() {
+            const radii = students.map((_, i) => i === selectedIndex ? 14 : 8);
+            const borderColors = students.map((_, i) => i === selectedIndex ? '#1e293b' : '#ffffff');
+            const borderWidths = students.map((_, i) => i === selectedIndex ? 3 : 2);
+            
+            classChart.data.datasets[0].pointRadius = radii;
+            classChart.data.datasets[0].borderColor = borderColors;
+            classChart.data.datasets[0].borderWidth = borderWidths;
+            classChart.update();
+        }
+
+        function updateAnalysisCard() {
+            const card = document.getElementById('analysisCard');
+            
+            if (selectedIndex === null || selectedIndex >= students.length) {
+                card.style.opacity = '0.5';
+                card.style.pointerEvents = 'none';
+                document.getElementById('detailName').innerText = 'Pilih Siswa...';
+                document.getElementById('detailZoneBadge').className = 'px-3 py-1 rounded text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-500';
+                document.getElementById('detailZoneBadge').innerText = '-';
+                document.getElementById('detailDiagnosis').innerText = 'Belum ada siswa terpilih.';
+                document.getElementById('detailAction').innerText = 'Belum ada siswa terpilih.';
+                // Reset card style
+                card.className = "bg-white rounded-2xl p-6 shadow-sm border border-slate-200 opacity-50 transition-opacity duration-300 pointer-events-none";
+                return;
+            }
+
+            const s = students[selectedIndex];
+            
+            card.style.opacity = '1';
+            card.style.pointerEvents = 'auto';
+            
+            // Apply Dynamic Styles based on Zone
+            card.className = `rounded-2xl p-6 shadow-md border-t-4 transition-all duration-300 ${s.zone.bgCard} ${s.zone.borderCard}`;
+            
+            document.getElementById('detailName').innerText = s.name;
+            document.getElementById('detailName').className = `text-xl font-bold mb-1 ${s.zone.textTitle}`;
+            
+            document.getElementById('detailZoneBadge').innerText = `${s.zone.name} | ${s.zone.type}`;
+            document.getElementById('detailZoneBadge').className = `px-3 py-1 rounded text-xs font-bold uppercase tracking-wider shadow-sm ${s.zone.badge}`;
+            
+            document.getElementById('detailDiagnosis').innerHTML = formatMarkdown(s.zone.diagnosis);
+            
+            // Format Action text for emphasis
+            const actionHTML = formatMarkdown(s.zone.action);
+            document.getElementById('detailAction').innerHTML = actionHTML;
+            document.getElementById('detailAction').className = `text-sm font-medium leading-relaxed bg-white p-3 rounded-lg border border-white min-h-[80px] shadow-sm ${s.zone.textTitle}`;
+        }
+
+        // Simple markdown formatter for bold and italics
+        function formatMarkdown(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>');
+        }
+
+        // --- Demo Data ---
+        function loadDemoData() {
+            students = [
+                { id: 1, name: "Andi R.", skill: 20, challenge: 80, zone: getZone(20, 80) },
+                { id: 2, name: "Budi S.", skill: 85, challenge: 20, zone: getZone(85, 20) },
+                { id: 3, name: "Citra M.", skill: 75, challenge: 85, zone: getZone(75, 85) },
+                { id: 4, name: "Dina W.", skill: 30, challenge: 40, zone: getZone(30, 40) },
+                { id: 5, name: "Eko P.", skill: 60, challenge: 65, zone: getZone(60, 65) },
+                { id: 6, name: "Farhan Z.", skill: 15, challenge: 90, zone: getZone(15, 90) }
+            ];
+            updateUI();
+            selectStudent(0);
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            updateUI();
+            updateAnalysisCard();
+            document.getElementById('addStudentForm').addEventListener('submit', addStudent);
+        });
+
+    </script>
+</body>
+</html>
