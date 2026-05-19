@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infografis Interaktif: Arsitektur Pedagogi & Flow State</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Chosen Palette: Deep Indigo (#1e1b4b) & Vibrant Cyan (#06b6d4) with Amber (#f59e0b) and Rose (#e11d48) accents for psychological states. -->
+    
+    <!-- Application Structure Plan: Dashboard-style vertical scroll layout. 1. Hero Introduction. 2. Conceptual Foundation (Flow Quadrant interactive scatter plot with quadrant background plugin). 3. Empirical Evidence (Engagement Bar Chart comparing traditional vs. Flow methods with gradient fills). 4. Actionable Pedagogical Pillars using refined CSS Grid/Flexbox Cards. -->
+    
+    <!-- Visualization & Content Choices: 1. Student States -> Relationships -> Scatter Plot (Chart.js) -> Features background quadrant coloring for immediate visual context. NO SVG. 2. Engagement Metrics -> Compare -> Bar Chart (Chart.js) -> Clear comparison with wrapped labels and rich tooltips. NO SVG. 3. 3 Pillars -> Organize -> CSS Grid Cards -> Uses unicode/emojis and CSS styles. NO SVG. -->
+    
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        /* Improved Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 50vh;
+            min-height: 350px;
+            max-height: 500px;
+            padding: 1.25rem;
+            background: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            border: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 45vh;
+                min-height: 320px;
+                padding: 0.75rem;
+                border-radius: 1rem;
+            }
+        }
+
+        .gradient-text {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-image: linear-gradient(135deg, #06b6d4, #3b82f6);
+        }
+
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: #06b6d4;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #22d3ee;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .interactive-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .interactive-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(6, 182, 212, 0.1), 0 8px 10px -6px rgba(6, 182, 212, 0.05);
+            border-color: #bae6fd;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-cyan-200 selection:text-cyan-900">
+
+    <nav class="bg-slate-900/95 text-white sticky top-0 z-50 shadow-lg border-b border-slate-800 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🌊</span>
+                    <span class="font-bold text-lg md:text-xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-300">Data Flow Pedagogi</span>
+                </div>
+                <div class="hidden md:flex space-x-8 text-sm font-semibold text-slate-300">
+                    <a href="#teori" class="nav-link">Teori Kognitif</a>
+                    <a href="#empiris" class="nav-link">Data Empiris</a>
+                    <a href="#implementasi" class="nav-link">Pilar Implementasi</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-20 lg:space-y-28">
+
+        <!-- Header / Hero Section -->
+        <header class="text-center py-16 lg:py-24 bg-white rounded-[2.5rem] shadow-sm border border-slate-200 relative overflow-hidden mt-4">
+            <div class="absolute inset-0 bg-gradient-to-br from-cyan-50 via-white to-blue-50 opacity-70"></div>
+            <!-- Decorative HTML circles (NO SVG) -->
+            <div class="absolute top-10 left-10 w-32 h-32 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
+            <div class="absolute bottom-10 right-10 w-40 h-40 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
+            
+            <div class="relative z-10 px-4 md:px-12">
+                <div class="inline-flex items-center gap-2 px-5 py-2 bg-cyan-100 text-cyan-800 rounded-full text-xs font-bold uppercase tracking-widest mb-8 border border-cyan-200 shadow-sm">
+                    <span>📊 Infografis Analitik</span>
+                </div>
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold text-slate-900 mb-8 tracking-tight leading-tight">
+                    Anatomi <span class="gradient-text">Flow State</span> <br class="hidden md:block"> dalam Pembelajaran
+                </h1>
+                <p class="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed font-medium">
+                    Analisis visual berdasarkan penelitian Mihaly Csikszentmihalyi dan David Shernoff mengenai keterlibatan siswa (<em>student engagement</em>), beban kognitif, dan arsitektur ekosistem literasi-numerasi.
+                </p>
+            </div>
+        </header>
+
+        <!-- Section 1: Teori Kognitif -->
+        <section id="teori" class="scroll-mt-24">
+            <div class="mb-12 text-center md:text-left">
+                <h2 class="text-3xl lg:text-4xl font-extrabold text-slate-900 flex items-center justify-center md:justify-start gap-4">
+                    <span class="text-4xl">🧭</span> Kuadran Kognitif Csikszentmihalyi
+                </h2>
+                <p class="text-slate-600 mt-5 text-lg lg:text-xl max-w-4xl leading-relaxed">
+                    Kondisi psikologis seorang siswa bukan kebetulan, melainkan hasil matematis dari rasio <strong>Tantangan Tugas</strong> berbanding <strong>Keterampilan Siswa</strong>.
+                </p>
+            </div>
+
+            <div class="bg-slate-900 p-6 md:p-10 rounded-[2rem] shadow-xl border border-slate-800 relative overflow-hidden">
+                <div class="flex flex-col lg:flex-row gap-10 items-center mb-2">
+                    <div class="w-full lg:w-1/3 text-white z-10">
+                        <h3 class="text-2xl font-bold mb-4 text-cyan-400">Peta Mental Siswa</h3>
+                        <p class="text-slate-300 text-base leading-relaxed mb-8">
+                            Grafik sebar ini memetakan 8 zona emosional utama. Tugas pendidik adalah menjaga siswa tetap berada di "Saluran Flow" dengan menyeimbangkan kesulitan materi secara dinamis.
+                        </p>
+                        <div class="grid grid-cols-2 gap-4 text-sm font-semibold">
+                            <div class="bg-slate-800/80 p-4 rounded-xl border-l-4 border-cyan-400 shadow-sm flex items-center gap-2"><span class="text-lg">🌊</span> Flow</div>
+                            <div class="bg-slate-800/80 p-4 rounded-xl border-l-4 border-rose-500 shadow-sm flex items-center gap-2"><span class="text-lg">🔴</span> Cemas</div>
+                            <div class="bg-slate-800/80 p-4 rounded-xl border-l-4 border-amber-400 shadow-sm flex items-center gap-2"><span class="text-lg">🟡</span> Bosan</div>
+                            <div class="bg-slate-800/80 p-4 rounded-xl border-l-4 border-slate-500 shadow-sm flex items-center gap-2"><span class="text-lg">⚪</span> Apatis</div>
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-2/3 z-10">
+                        <div class="chart-container" style="background-color: #0f172a; border-color: #1e293b; box-shadow: 0 0 40px rgba(0,0,0,0.5);">
+                            <canvas id="flowQuadrantChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Data Empiris -->
+        <section id="empiris" class="scroll-mt-24">
+            <div class="mb-12 text-center md:text-left">
+                <h2 class="text-3xl lg:text-4xl font-extrabold text-slate-900 flex items-center justify-center md:justify-start gap-4">
+                    <span class="text-4xl">📈</span> Bukti Empiris Keterlibatan
+                </h2>
+                <p class="text-slate-600 mt-5 text-lg lg:text-xl max-w-4xl leading-relaxed">
+                    Data dari studi Shernoff et al. (2014) menunjukkan perbedaan drastis pada Kualitas Pengalaman (<em>Quality of Experience</em>) siswa saat berada di kelas konvensional dibandingkan dengan kelas yang memfasilitasi <em>Flow</em>.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-12 gap-8 items-stretch">
+                <div class="lg:col-span-8">
+                    <div class="chart-container h-full">
+                        <canvas id="engagementBarChart"></canvas>
+                    </div>
+                </div>
+                <div class="lg:col-span-4 flex flex-col justify-between gap-6">
+                    <div class="bg-white p-8 rounded-[1.5rem] shadow-sm border border-slate-200 interactive-card h-full flex flex-col justify-center">
+                        <div class="w-14 h-14 bg-cyan-100 rounded-full flex items-center justify-center text-3xl mb-5">🎯</div>
+                        <h4 class="font-extrabold text-slate-900 text-xl mb-3">Lonjakan Konsentrasi</h4>
+                        <p class="text-base text-slate-600 leading-relaxed">Di lingkungan Flow, skor konsentrasi melonjak signifikan karena memori kerja tidak terbebani oleh <em>Extraneous Load</em> (kebisingan visual/desain UI yang buruk).</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-[1.5rem] shadow-sm border border-slate-200 interactive-card h-full flex flex-col justify-center">
+                        <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center text-3xl mb-5">🔥</div>
+                        <h4 class="font-extrabold text-slate-900 text-xl mb-3">Motivasi Intrinsik</h4>
+                        <p class="text-base text-slate-600 leading-relaxed">Terjadi pergeseran fundamental: Keterlibatan tidak lagi didorong oleh nilai atau ketakutan, melainkan oleh kepuasan kognitif saat menaklukkan masalah (autotelic experience).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Pilar Implementasi -->
+        <section id="implementasi" class="scroll-mt-24">
+            <div class="mb-12 text-center max-w-3xl mx-auto">
+                <h2 class="text-3xl lg:text-4xl font-extrabold text-slate-900 flex items-center justify-center gap-4">
+                    <span class="text-4xl">🏗️</span> Arsitektur Implementasi
+                </h2>
+                <p class="text-slate-600 mt-5 text-lg lg:text-xl leading-relaxed">
+                    Untuk merekayasa ekosistem ini, pendidik harus bertransformasi menjadi "Arsitek Kognitif" dengan menerapkan tiga pilar pedagogis utama.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Pillar 1 -->
+                <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-200 interactive-card relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-cyan-100 rounded-full blur-3xl -mr-10 -mt-10 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="bg-gradient-to-br from-cyan-400 to-cyan-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-bold mb-6 shadow-md shadow-cyan-200 relative z-10">1</div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4 relative z-10">Otonomi & Tujuan</h3>
+                    <p class="text-base text-slate-600 leading-relaxed relative z-10">Berikan kejelasan (<em>Sense of Control</em>). Siswa tidak hanya menerima instruksi, tapi memilih metodenya. Contoh: Literasi tidak lagi tugas "merangkum", melainkan memproduksi laporan untuk audiens spesifik.</p>
+                </div>
+
+                <!-- Pillar 2 -->
+                <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-200 interactive-card relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-blue-100 rounded-full blur-3xl -mr-10 -mt-10 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="bg-gradient-to-br from-blue-400 to-blue-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-bold mb-6 shadow-md shadow-blue-200 relative z-10">2</div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4 relative z-10">Modulasi Dinamis</h3>
+                    <p class="text-base text-slate-600 leading-relaxed relative z-10">Tinggalkan silabus kaku. Gunakan pendekatan <em>Agile</em>. Tantangan dinaikkan secara iteratif sesuai <em>Zone of Proximal Development</em> (ZPD) untuk mencegah kebosanan dan kecemasan secara real-time.</p>
+                </div>
+
+                <!-- Pillar 3 -->
+                <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-200 interactive-card relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-100 rounded-full blur-3xl -mr-10 -mt-10 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="bg-gradient-to-br from-indigo-400 to-indigo-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-bold mb-6 shadow-md shadow-indigo-200 relative z-10">3</div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4 relative z-10">Umpan Balik Instan</h3>
+                    <p class="text-base text-slate-600 leading-relaxed relative z-10">Pilar esensial Konstruksionisme (Papert). Numerasi wajib menggunakan simulator dinamis tanpa latensi, dan literasi wajib menggunakan sesi <em>Peer-Review</em> cepat antar siswa sebelum draf final.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="text-center py-16 border-t border-slate-200 mt-20">
+            <h2 class="text-3xl font-extrabold text-slate-800 mb-6">Membangun Ekosistem Kognitif</h2>
+            <p class="text-slate-500 max-w-3xl mx-auto mb-10 text-lg leading-relaxed font-medium italic">
+                "Kegembiraan intelektual tertinggi tidak dirasakan saat kita diberikan jawaban yang mudah, melainkan saat kita berhasil memecahkan kebingungan yang rumit melalui usaha kita sendiri."
+            </p>
+            <div class="inline-block bg-slate-100 px-4 py-2 rounded-lg">
+                <p class="text-xs font-bold tracking-widest uppercase text-slate-500">Data bersumber dari Landasan Filosofis & Aplikasi Flow Theory</p>
+            </div>
+        </footer>
+
+    </main>
+
+    <script>
+        // Utility for processing long labels in Chart.js
+        function processLabels(labels) {
+            return labels.map(label => {
+                if (label.length <= 16) return label;
+                const words = label.split(' ');
+                let lines = [];
+                let currentLine = '';
+                words.forEach(word => {
+                    if ((currentLine + word).length > 16) {
+                        if (currentLine) lines.push(currentLine.trim());
+                        currentLine = word + ' ';
+                    } else {
+                        currentLine += word + ' ';
+                    }
+                });
+                if (currentLine) lines.push(currentLine.trim());
+                return lines;
+            });
+        }
+
+        // Global Chart Defaults
+        Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+        Chart.defaults.color = '#64748b';
+
+        // --- CHART 1: Flow Quadrant Scatter Plot ---
+        // Custom Plugin to draw Colored Zones in the background
+        const quadrantBackgroundPlugin = {
+            id: 'quadrantBackground',
+            beforeDraw: (chart) => {
+                const { ctx, chartArea: { top, bottom, left, right }, scales: { x, y } } = chart;
+                const midX = x.getPixelForValue(50);
+                const midY = y.getPixelForValue(50);
+
+                ctx.save();
+                
+                // Top-Left: Anxiety Zone (Red)
+                ctx.fillStyle = 'rgba(225, 29, 72, 0.15)'; 
+                ctx.fillRect(left, top, midX - left, midY - top);
+                
+                // Top-Right: Flow Zone (Cyan/Blue)
+                ctx.fillStyle = 'rgba(6, 182, 212, 0.15)'; 
+                ctx.fillRect(midX, top, right - midX, midY - top);
+                
+                // Bottom-Left: Apathy Zone (Slate)
+                ctx.fillStyle = 'rgba(148, 163, 184, 0.1)'; 
+                ctx.fillRect(left, midY, midX - left, bottom - midY);
+                
+                // Bottom-Right: Boredom Zone (Amber)
+                ctx.fillStyle = 'rgba(245, 158, 11, 0.15)'; 
+                ctx.fillRect(midX, midY, right - midX, bottom - midY);
+                
+                // Draw Flow Channel (Diagonal visualization)
+                ctx.beginPath();
+                ctx.moveTo(left, bottom - (bottom-top)*0.15);
+                ctx.lineTo(right - (right-left)*0.15, top);
+                ctx.lineTo(right, top + (bottom-top)*0.15);
+                ctx.lineTo(left + (right-left)*0.15, bottom);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+                ctx.fill();
+
+                // Axis Lines (Crosshair)
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([5, 5]);
+                ctx.moveTo(midX, top);
+                ctx.lineTo(midX, bottom);
+                ctx.moveTo(left, midY);
+                ctx.lineTo(right, midY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Background Text Labels
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.font = 'bold 16px "Plus Jakarta Sans", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('KECEMASAN', left + (midX-left)/2, top + (midY-top)/2);
+                ctx.fillText('FLOW STATE', midX + (right-midX)/2, top + (midY-top)/2);
+                ctx.fillText('APATIS', left + (midX-left)/2, midY + (bottom-midY)/2);
+                ctx.fillText('KEBOSANAN', midX + (right-midX)/2, midY + (bottom-midY)/2);
+                
+                ctx.restore();
+            }
+        };
+
+        function renderFlowQuadrant() {
+            const ctx = document.getElementById('flowQuadrantChart').getContext('2d');
+            Chart.register(quadrantBackgroundPlugin);
+            
+            const quadrantData = [
+                { x: 85, y: 85, label: 'Kondisi Optimal Siswa: Flow State (Fokus, Autotelic)', category: 'Flow' },
+                { x: 20, y: 80, label: 'Kecemasan: Materi melampaui kemampuan dasar siswa', category: 'Anxiety' },
+                { x: 40, y: 65, label: 'Tergugah: Siswa waspada dan terpacu belajar', category: 'Arousal' },
+                { x: 80, y: 40, label: 'Pengendalian: Siswa merasa sangat menguasai masalah', category: 'Control' },
+                { x: 80, y: 20, label: 'Relaksasi: Tugas dirasa terlalu mudah', category: 'Relaxation' },
+                { x: 60, y: 20, label: 'Kebosanan: Kurangnya stimulasi / tugas repetitif', category: 'Boredom' },
+                { x: 20, y: 20, label: 'Apatis: Ketidakhadiran kognitif total', category: 'Apathy' },
+                { x: 20, y: 50, label: 'Kekhawatiran: Kurang percaya diri terhadap materi', category: 'Worry' }
+            ];
+
+            const pointColors = quadrantData.map(d => {
+                if(d.category === 'Flow' || d.category === 'Control') return '#22d3ee'; // Cyan
+                if(d.category === 'Anxiety' || d.category === 'Worry') return '#fb7185'; // Rose
+                if(d.category === 'Boredom' || d.category === 'Relaxation') return '#fbbf24'; // Amber
+                return '#cbd5e1'; // Slate (Apathy/Arousal)
+            });
+
+            new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Status Psikologis',
+                        data: quadrantData,
+                        backgroundColor: pointColors,
+                        pointRadius: 12,
+                        pointHoverRadius: 16,
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        shadowOffsetX: 0,
+                        shadowOffsetY: 4,
+                        shadowBlur: 10,
+                        shadowColor: 'rgba(0,0,0,0.5)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: { padding: { top: 10, right: 20, bottom: 10, left: 10 } },
+                    scales: {
+                        x: {
+                            min: 0, max: 100,
+                            title: { display: true, text: 'KETERAMPILAN SISWA (SKILL) ➔', color: '#94a3b8', font: { weight: 'bold', size: 11, tracking: 1 } },
+                            grid: { display: false },
+                            ticks: { display: false }
+                        },
+                        y: {
+                            min: 0, max: 100,
+                            title: { display: true, text: 'TANTANGAN TUGAS (CHALLENGE) ➔', color: '#94a3b8', font: { weight: 'bold', size: 11, tracking: 1 } },
+                            grid: { display: false },
+                            ticks: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                            titleColor: '#0f172a',
+                            bodyColor: '#475569',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            padding: 12,
+                            titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 14, weight: 'bold' },
+                            bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 13 },
+                            displayColors: true,
+                            callbacks: {
+                                title: function(context) {
+                                    // Extract the category name
+                                    return context[0].raw.category.toUpperCase();
+                                },
+                                label: function(context) {
+                                    return context.raw.label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- CHART 2: Engagement Bar Chart ---
+        function renderEngagementChart() {
+            const ctx = document.getElementById('engagementBarChart').getContext('2d');
+            
+            // Setup Gradients for Bars
+            let gradientConv = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientConv.addColorStop(0, '#94a3b8');
+            gradientConv.addColorStop(1, '#cbd5e1');
+
+            let gradientFlow = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientFlow.addColorStop(0, '#06b6d4'); // Cyan 500
+            gradientFlow.addColorStop(1, '#3b82f6'); // Blue 500
+
+            const rawLabels = [
+                'Tingkat Konsentrasi',
+                'Minat Intrinsik',
+                'Kebahagiaan (Joy)',
+                'Pemahaman Materi',
+                'Motivasi Belajar',
+                'Keterlibatan Aktif'
+            ];
+            // Process labels to prevent overflow on mobile
+            const wrappedLabels = processLabels(rawLabels);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: wrappedLabels,
+                    datasets: [
+                        {
+                            label: 'Kelas Konvensional (Instruksionis)',
+                            data: [35, 40, 45, 55, 42, 38],
+                            backgroundColor: gradientConv,
+                            borderRadius: 8,
+                            borderSkipped: false
+                        },
+                        {
+                            label: 'Lingkungan Berbasis Flow',
+                            data: [88, 85, 78, 92, 86, 90],
+                            backgroundColor: gradientFlow,
+                            borderRadius: 8,
+                            borderSkipped: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: { padding: { top: 20 } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: { display: true, text: 'Skor Pengalaman (%)', font: { weight: 'bold', size: 12 }, color: '#64748b' },
+                            grid: { color: '#f1f5f9', drawBorder: false },
+                            ticks: { font: { weight: '600', size: 11 } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { 
+                                font: { weight: '700', size: window.innerWidth < 768 ? 9 : 11 },
+                                color: '#475569'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: { usePointStyle: true, boxWidth: 10, font: { weight: '700', size: 12 }, color: '#334155' }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleFont: { family: "'Plus Jakarta Sans', sans-serif", size: 14 },
+                            bodyFont: { family: "'Plus Jakarta Sans', sans-serif", size: 15, weight: 'bold' },
+                            padding: 14,
+                            cornerRadius: 8,
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    const item = tooltipItems[0];
+                                    let label = item.chart.data.labels[item.dataIndex];
+                                    return Array.isArray(label) ? label.join(' ') : label;
+                                },
+                                label: function(context) {
+                                    return ` ${context.dataset.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderFlowQuadrant();
+            renderEngagementChart();
+        });
+    </script>
+</body>
+</html>
